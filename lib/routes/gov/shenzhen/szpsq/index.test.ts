@@ -55,29 +55,23 @@ describe('深圳市坪山区人民政府保障性住房', () => {
         mockedTryGet.mockImplementation((_key, getter) => getter());
     });
 
-    it('maps every supported category to the expected source URL', async () => {
+    it.each([
+        ['tzgg', '通知公告', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/index.html'],
+        ['zcfg', '政策法规', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/zcfg/index.html'],
+        ['xmxx', '项目信息', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/xmxx/index.html'],
+        ['fptg', '分配通告', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/fptg/index.html'],
+        ['fpgc', '分配过程', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/fpgc/index.html'],
+        ['fpjg', '分配结果', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/fpjg/index.html'],
+    ])('maps category %s to the expected source URL', async (category, title, url) => {
         const { route } = await import('./index');
-        const cases = [
-            ['tzgg', '通知公告', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/index.html'],
-            ['zcfg', '政策法规', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/zcfg/index.html'],
-            ['xmxx', '项目信息', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/xmxx/index.html'],
-            ['fptg', '分配通告', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/fptg/index.html'],
-            ['fpgc', '分配过程', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/fpgc/index.html'],
-            ['fpjg', '分配结果', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/fpjg/index.html'],
-        ] as const;
+        mockedOfetch.mockResolvedValueOnce(listHtml).mockResolvedValueOnce(detailHtml).mockResolvedValueOnce(detailHtml);
 
-        await Promise.all(
-            cases.map(async ([category, title, url], index) => {
-                mockedOfetch.mockResolvedValueOnce(listHtml).mockResolvedValueOnce(detailHtml).mockResolvedValueOnce(detailHtml);
+        const data = await route.handler(createContext(category));
 
-                const data = await route.handler(createContext(category));
-
-                expect(mockedOfetch).toHaveBeenNthCalledWith(index * 3 + 1, url);
-                expect(data.title).toBe(`深圳市坪山区人民政府 - 保障性住房 - ${title}`);
-                expect(data.link).toBe(url);
-                expect(data.item).toHaveLength(2);
-            })
-        );
+        expect(mockedOfetch).toHaveBeenNthCalledWith(1, url);
+        expect(data.title).toBe(`深圳市坪山区人民政府 - 保障性住房 - ${title}`);
+        expect(data.link).toBe(url);
+        expect(data.item).toHaveLength(2);
     });
 
     it('parses list items, normalizes links, parses dates, and fetches detail descriptions through cache', async () => {
