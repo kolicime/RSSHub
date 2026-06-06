@@ -63,7 +63,7 @@ describe('深圳市坪山区人民政府保障性住房', () => {
         ['fpgc', '分配过程', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/fpgc/index.html'],
         ['fpjg', '分配结果', 'https://www.szpsq.gov.cn/ztfw/zfbzfw/fpjg/index.html'],
     ])('maps category %s to the expected source URL', async (category, title, url) => {
-        const { route } = await import('./index');
+        const { route } = await import('@/routes/gov/shenzhen/szpsq/index');
         mockedOfetch.mockResolvedValueOnce(listHtml).mockResolvedValueOnce(detailHtml).mockResolvedValueOnce(detailHtml);
 
         const data = await route.handler(createContext(category));
@@ -75,7 +75,7 @@ describe('深圳市坪山区人民政府保障性住房', () => {
     });
 
     it('parses list items, normalizes links, parses dates, and fetches detail descriptions through cache', async () => {
-        const { route } = await import('./index');
+        const { route } = await import('@/routes/gov/shenzhen/szpsq/index');
         mockedOfetch.mockResolvedValueOnce(listHtml).mockResolvedValueOnce(detailHtml).mockResolvedValueOnce(detailHtml);
 
         const data = await route.handler(createContext('tzgg'));
@@ -102,7 +102,7 @@ describe('深圳市坪山区人民政府保障性住房', () => {
     });
 
     it('omits pubDate when the list item has no date text', async () => {
-        const { route } = await import('./index');
+        const { route } = await import('@/routes/gov/shenzhen/szpsq/index');
         mockedOfetch.mockResolvedValueOnce('<ul><li><a href="item.html">无日期通知</a></li></ul>').mockResolvedValueOnce(detailHtml);
 
         const data = await route.handler(createContext('tzgg'));
@@ -119,7 +119,7 @@ describe('深圳市坪山区人民政府保障性住房', () => {
     });
 
     it('throws InvalidParameterError for unsupported category', async () => {
-        const { route } = await import('./index');
+        const { route } = await import('@/routes/gov/shenzhen/szpsq/index');
 
         await expect(route.handler(createContext('bad'))).rejects.toBeInstanceOf(InvalidParameterError);
         expect(mockedOfetch).not.toHaveBeenCalled();
