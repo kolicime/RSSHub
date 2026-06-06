@@ -1,9 +1,9 @@
 import { load } from 'cheerio';
+import { Agent, fetch } from 'undici';
 
 import InvalidParameterError from '@/errors/types/invalid-parameter';
 import type { Route } from '@/types';
 import cache from '@/utils/cache';
-import ofetch from '@/utils/ofetch';
 import { parseDate } from '@/utils/parse-date';
 import timezone from '@/utils/timezone';
 
@@ -16,6 +16,18 @@ type ListItem = {
     title: string;
     link: string;
     pubDate?: Date;
+};
+
+// www.szpsq.gov.cn negotiates an EC point that Node's OpenSSL 3 rejects with
+// "tls_process_ske_ecdhe:bad ecpoint", so the default fetch fails the TLS
+// handshake. Forcing a non-ECDHE cipher suite avoids the broken curve
+// negotiation. ofetch cannot be used here because it does not forward the
+// `dispatcher` option to its internal fetch call.
+const tlsAgent = new Agent({ connect: { ciphers: 'DEFAULT:!ECDHE' } });
+
+const fetchText = async (url: string): Promise<string> => {
+    const response = await fetch(url, { dispatcher: tlsAgent });
+    return await response.text();
 };
 
 const categories = {
@@ -83,7 +95,7 @@ async function handler(ctx) {
     }
 
     const config = categories[category];
-    const response = await ofetch(config.url);
+    const response = await fetchText(config.url);
     const $ = load(response);
     const list = $('.listsBox li')
         .toArray()
@@ -109,13 +121,21 @@ async function handler(ctx) {
     const items = await Promise.all(
         list.map((item) =>
             cache.tryGet(item.link, async () => {
-                const detailResponse = await ofetch(item.link);
-                const content = load(detailResponse);
-                const description = content('.article-content, .TRS_Editor').first().html();
-                return {
-                    ...item,
-                    ...(description ? { description } : {}),
-                };
+                try {
+                    const detailResponse = await fetchText(item.link);
+                    const content = load(detailResponse);
+                    const description = content('.article-content, .TRS_Editor').first().html();
+                    return {
+                        ...item,
+                        ...(description ? { description } : {}),
+                    };
+                } catch {
+                    // Some entries (e.g. 政策法规) link to other government domains
+                    // whose TLS requirements conflict with this site's. When the
+                    // detail page is unreachable, fall back to the list-level item
+                    // so a single unreachable link does not break the whole feed.
+                    return item;
+                }
             })
         )
     );
