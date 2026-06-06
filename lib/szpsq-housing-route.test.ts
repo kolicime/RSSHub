@@ -32,10 +32,14 @@ const createContext = (category: string) =>
 const listHtml = `
 <html>
 <body>
-<ul class="news-list">
-<li><a href="./202606/t20260601_123.html">坪山区住房保障通知</a><span>2026-06-01</span></li>
-<li><a href="/ztfw/zfbzfw/tzgg/202605/t20260530_456.html">坪山区配租提醒</a><span>2026-05-30</span></li>
+<div class="whiteBg listsBox">
+<div class="newListsT1 newListsH">
+<ul>
+<li title="坪山区住房保障通知"><a href="./content/post_12811714.html"><i></i>坪山区住房保障通知<em>2026-06-01</em></a></li>
+<li title="坪山区配租提醒"><a href="/ztfw/zfbzfw/tzgg/content/post_12803045.html"><i></i>坪山区配租提醒<em>2026-05-30</em></a></li>
 </ul>
+</div>
+</div>
 </body>
 </html>
 `;
@@ -43,7 +47,7 @@ const listHtml = `
 const detailHtml = `
 <html>
 <body>
-<div class="article-content"><p>这是保障性住房通知正文。</p></div>
+<div class="article-content p30"><p>这是保障性住房通知正文。</p></div>
 </body>
 </html>
 `;
@@ -85,25 +89,25 @@ describe('深圳市坪山区人民政府保障性住房', () => {
         expect(data.item).toEqual([
             expect.objectContaining({
                 title: '坪山区住房保障通知',
-                link: 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/202606/t20260601_123.html',
+                link: 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/content/post_12811714.html',
                 description: '<p>这是保障性住房通知正文。</p>',
             }),
             expect.objectContaining({
                 title: '坪山区配租提醒',
-                link: 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/202605/t20260530_456.html',
+                link: 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/content/post_12803045.html',
                 description: '<p>这是保障性住房通知正文。</p>',
             }),
         ]);
         expect(data.item[0].pubDate?.toISOString()).toBe('2026-05-31T16:00:00.000Z');
         expect(data.item[1].pubDate?.toISOString()).toBe('2026-05-29T16:00:00.000Z');
         expect(mockedTryGet).toHaveBeenCalledTimes(2);
-        expect(mockedTryGet).toHaveBeenNthCalledWith(1, 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/202606/t20260601_123.html', expect.any(Function));
-        expect(mockedTryGet).toHaveBeenNthCalledWith(2, 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/202605/t20260530_456.html', expect.any(Function));
+        expect(mockedTryGet).toHaveBeenNthCalledWith(1, 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/content/post_12811714.html', expect.any(Function));
+        expect(mockedTryGet).toHaveBeenNthCalledWith(2, 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/content/post_12803045.html', expect.any(Function));
     });
 
     it('omits pubDate when the list item has no date text', async () => {
         const { route } = await import('@/routes/gov/shenzhen/szpsq/index');
-        mockedOfetch.mockResolvedValueOnce('<ul><li><a href="item.html">无日期通知</a></li></ul>').mockResolvedValueOnce(detailHtml);
+        mockedOfetch.mockResolvedValueOnce('<div class="listsBox"><ul><li title="无日期通知"><a href="content/post_1.html"><i></i>无日期通知</a></li></ul></div>').mockResolvedValueOnce(detailHtml);
 
         const data = await route.handler(createContext('tzgg'));
 
@@ -111,7 +115,7 @@ describe('深圳市坪山区人民政府保障性住房', () => {
         expect(data.item[0]).toEqual(
             expect.objectContaining({
                 title: '无日期通知',
-                link: 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/item.html',
+                link: 'https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/content/post_1.html',
                 description: '<p>这是保障性住房通知正文。</p>',
             })
         );

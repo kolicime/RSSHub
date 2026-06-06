@@ -85,14 +85,14 @@ async function handler(ctx) {
     const config = categories[category];
     const response = await ofetch(config.url);
     const $ = load(response);
-    const list = $('li')
+    const list = $('.listsBox li')
         .toArray()
         .map((item): ListItem | undefined => {
             const element = $(item);
             const link = element.find('a').first();
             const href = link.attr('href');
-            const title = link.text();
-            const dateText = element.find('span').first().text();
+            const title = element.attr('title') || link.find('em').remove().end().text().trim();
+            const dateText = link.find('em').text().trim();
 
             if (!href || !title) {
                 return undefined;
@@ -111,7 +111,7 @@ async function handler(ctx) {
             cache.tryGet(item.link, async () => {
                 const detailResponse = await ofetch(item.link);
                 const content = load(detailResponse);
-                const description = content('.article-content, .TRS_Editor, .content, .news_cont_d_wrap').first().html();
+                const description = content('.article-content, .TRS_Editor').first().html();
                 return {
                     ...item,
                     ...(description ? { description } : {}),
