@@ -26,6 +26,41 @@ RSSHub pairs especially well with [Folo](https://folo.is/), an AI RSS reader for
 
 [Documentation](https://docs.rsshub.app) | [Folo](https://folo.is/) | [Telegram Group](https://t.me/rsshub) | [Telegram Channel](https://t.me/awesomeRSSHub) | [X (Twitter)](https://x.com/intent/follow?screen_name=_RSSHub)
 
+## New Route: 深圳市坪山区人民政府 - 保障性住房
+
+为深圳市坪山区人民政府网站的「保障性住房」内容提供 RSS 订阅，覆盖 6 个栏目。
+
+**路由：** `/gov/shenzhen/szpsq/zfbzfw/:category`
+
+**示例：** `/gov/shenzhen/szpsq/zfbzfw/tzgg`
+
+**参数：** `category`，保障性住房栏目，取值如下表。
+
+| 栏目     | category | 栏目页面                                               |
+| -------- | -------- | ------------------------------------------------------ |
+| 通知公告 | `tzgg`   | `https://www.szpsq.gov.cn/ztfw/zfbzfw/tzgg/index.html` |
+| 政策法规 | `zcfg`   | `https://www.szpsq.gov.cn/ztfw/zfbzfw/zcfg/index.html` |
+| 项目信息 | `xmxx`   | `https://www.szpsq.gov.cn/ztfw/zfbzfw/xmxx/index.html` |
+| 分配通告 | `fptg`   | `https://www.szpsq.gov.cn/ztfw/zfbzfw/fptg/index.html` |
+| 分配过程 | `fpgc`   | `https://www.szpsq.gov.cn/ztfw/zfbzfw/fpgc/index.html` |
+| 分配结果 | `fpjg`   | `https://www.szpsq.gov.cn/ztfw/zfbzfw/fpjg/index.html` |
+
+**订阅地址示例**（以本地部署 `http://localhost:1200` 为例，可替换为任意 RSSHub 实例）：
+
+| 栏目     | 订阅地址                                               |
+| -------- | ------------------------------------------------------ |
+| 通知公告 | `http://localhost:1200/gov/shenzhen/szpsq/zfbzfw/tzgg` |
+| 政策法规 | `http://localhost:1200/gov/shenzhen/szpsq/zfbzfw/zcfg` |
+| 项目信息 | `http://localhost:1200/gov/shenzhen/szpsq/zfbzfw/xmxx` |
+| 分配通告 | `http://localhost:1200/gov/shenzhen/szpsq/zfbzfw/fptg` |
+| 分配过程 | `http://localhost:1200/gov/shenzhen/szpsq/zfbzfw/fpgc` |
+| 分配结果 | `http://localhost:1200/gov/shenzhen/szpsq/zfbzfw/fpjg` |
+
+**说明：**
+
+- 每个栏目独立订阅，输出该栏目列表页的文章，包含标题、链接、发布日期与正文。
+- 「政策法规」栏目部分文章链接指向 `zjj.sz.gov.cn` 等其他政府域名，若详情页因 TLS 兼容问题无法抓取，将自动降级为列表级条目（保留标题、链接、日期），不会影响整个订阅源的可用性。
+
 ## Related Projects
 
 - [Folo](https://folo.is/) | An AI RSS reader that works especially well with RSSHub. Source code: [GitHub](https://github.com/RSSNext/Folo).
